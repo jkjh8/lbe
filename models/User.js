@@ -13,7 +13,8 @@ const userSchema = new mongoose.Schema({
   roles: { type: Array },
   provider: { type: String },
   kakao: { type: Object },
-  date: { type: Date, default: Date.now }
+  createAt: { type: Date },
+  updateAt: { type: Date }
 })
 userSchema.plugin(require('mongoose-bcrypt')), { rounds: 10 }
 const User = mongoose.model('User', userSchema)

@@ -1,4 +1,5 @@
 const passport = require('passport')
+const path =require('path')
 const User = require('../../models/User')
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
@@ -6,7 +7,7 @@ const dotenv = require('dotenv')
 
 dotenv.config({ path: path.join(__dirname, '../../.env') })
 
-module.exports.register = function (req, res) {
+module.exports.register = async function (req, res) {
   const chkEmail = await User.findOne({ email: req.body.email })
   if (chkEmail) return res.status(403).json({ message: 'This email is already use' })
 
@@ -46,7 +47,7 @@ module.exports.login = function (req, res) {
   })(req, res)
 }
 
-module.exports.user = function(req, res) {
+module.exports.getUser = function(req, res) {
   passport.authenticate('access', { session: false }, (err, user) => {
     if (err) { return res.status(403).json({ user: null }) }
     if (!user.enable) { return res.status(403).json({ user: null }) }

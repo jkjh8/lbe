@@ -1,9 +1,18 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express')
+const router = express.Router()
+
+const users = require('../api/users')
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+// router.get('/', function(req, res, next) {
+//   res.send('respond with a resource');
+// });
 
-module.exports = router;
+router.post('/local', users.login)
+router.post('/local/register', users.register)
+router.get('/logout', users.logout)
+
+router.get('/get', users.getUser)
+router.get('/refresh', users.refresh)
+
+module.exports = router
