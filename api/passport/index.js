@@ -1,5 +1,4 @@
 const passport = require("passport")
-const passportJWT = require("passport-jwt")
 const bcrypt = require("bcrypt")
 const path = require('path')
 const dotenv = require('dotenv')
@@ -7,8 +6,8 @@ const moment = require('moment')
 
 dotenv.config({ path: path.join(__dirname, '../../.env') })
 
-const JWTStrategy = passportJWT.Strategy
-const ExtractJwt = passportJWT.ExtractJwt
+const JWTStrategy = require('passport-jwt').Strategy
+const ExtractJwt = require('passport-jwt').ExtractJwt
 
 const LocalStrategy = require("passport-local").Strategy
 
@@ -26,23 +25,20 @@ const refOption = {
   secretOrKey: process.env.JWT_SECRET
 }
 
-
-async function localVerify (id, password, done) {
-  let user
-  try {
-    user = await Users.findOne({ id: id }, { _id: 0 })
-
-    // not user
+// 로컬 인증
+async function localVerify(id, password, done) {
+  Users.findOne({ email: id }, { _id: 0, password: 0 }).then((err, user) => {
+    if (err) return done(err)
     if (!user) return done(null, false, { message: '사용자를 찾을 수 없습니다.' })
-
-    // chk password
-    const isSamePassword = await bcrypt.compare(password, user.password)
-    if (!isSamePassword) return done(null, false, { message: '패스워드가 일치 하지 않습니다.' })
-
-    return done(null, user)
-  } catch (err) {
-    done(err)
-  }
+    bcrypt.compare(password, user.password, (error, result) => {
+      if (error) return done(error)
+      if (result) {
+        return done(null, user)
+      } else {
+        return done(null, false, { message: '패스워드가 일치 하지 않습니다.' })
+      }
+    })
+  })
 }
 
 async function jwtVerift(payload, done) {
