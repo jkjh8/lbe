@@ -7,7 +7,9 @@ router.get('/', function(req, res, next) {
 });
 
 const users = require('./users')
+const log = require('./log')
 
 router.use('/auth', users)
+router.use('/log', log)
 
 module.exports = router
