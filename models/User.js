@@ -14,9 +14,9 @@ const userSchema = new mongoose.Schema({
   provider: { type: String },
   kakao: { type: Object },
   createAt: { type: Date },
-  updateAt: { type: Date },
-  refreshToken: { type: String, require: true, default: '' }
+  updateAt: { type: Date }
 })
+
 userSchema.plugin(require('mongoose-bcrypt')), { rounds: 10 }
 const User = mongoose.model('User', userSchema)
 

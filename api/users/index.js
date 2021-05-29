@@ -37,7 +37,8 @@ module.exports.login = function (req, res) {
   passport.authenticate('local', {
     session: false
   }, (err, user, info) => {
-    if (err || !user) return res.status(401).json({
+    console.log(err, user, info)
+    if (err || !user) return res.status(404).json({
       message: 'Error! user not found',
       info: info
     })
@@ -45,28 +46,27 @@ module.exports.login = function (req, res) {
     req.login(user, {
       session: false
     }, (error) => {
-      if (error) return res.status(401).json({
+      if (error) return res.status(404).json({
         message: 'user error', error: error
       })
       
       const accessToken = jwt.sign({
-        id: user.id
+        email: user.email
       }, process.env.JWT_SECRET, {
         expiresIn: '1m'
       })
 
       const refreshToken = jwt.sign({
-        id: user.id
+        email: user.email
       }, process.env.JWT_SECRET, {
         expiresIn: '7d'
       })
 
       User.updateOne({
-        id: user.id
+        email: user.email
       }, {
         $set: {
-          updateAt: Date.now(),
-          refreshToken: refreshToken
+          updateAt: Date.now()
         }
       }, {
         upsert: true
@@ -116,16 +116,14 @@ module.exports.isLoggedIn = (req, res, next) => {
 }
 
 module.exports.refresh = function (req, res) {
-  passport.authenticate('refresh', { session: false }, async (err, user, payload) => {
+  passport.authenticate('refresh', { session: false }, (err, user, payload) => {
     if (err||!user) return res.status(401).json({ user: null })
     const time1 = moment()
     const time2 = moment(payload.exp * 1000)
-    const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1m'})
+    const accessToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '1m'})
     
     if (moment.duration(time2.diff(time1)).asDays() < 1) {
-      const refreshToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' })
-
-      await User.updateOne({ id: user.id }, { $set: { updateAt: Date.now, refreshToken: refreshToken }})
+      const refreshToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' })
       return res.status(201).json({ refreshToken: refreshToken, accessToken: accessToken, user: user })
     }
     res.status(201).json({ accessToken: accessToken, user: user })
