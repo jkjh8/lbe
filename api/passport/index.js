@@ -10,13 +10,25 @@ const LocalStrategy = require("passport-local").Strategy
 const Users = require("../../models/User") //load db
 dotenv.config({ path: path.join(__dirname, '../../.env') })
 
+const getAccessTokenFromCookie = function (req) {
+  let token = null
+  if (req && req.cookies) token = req.cookies['accessToken'];
+  return token
+}
+
+const getRefreshTokenFromCookie = function (req) {
+  let token = null
+  if (req && req.cookies) token = req.cookies['refreshToken'];
+  return token
+}
+
 const LocalOption = { usernameField: 'email', passwordField: 'password' }
 const jwtOption = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: getAccessTokenFromCookie,
   secretOrKey: process.env.JWT_SECRET
 }
 const refOption = {
-  jwtFromRequest: ExtractJwt.fromHeader('refreshtoken'),
+  jwtFromRequest: getRefreshTokenFromCookie,
   secretOrKey: process.env.JWT_SECRET
 }
 

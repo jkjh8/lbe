@@ -74,17 +74,9 @@ module.exports.login = function (req, res) {
         if (err) {
           console.log(err)
         }
-        res.cookie('accessToken', accessToken, {
-          httpOnly: true,
-          maxAge: 6000
-        })
-        res.cookie('refreshToken', refreshToken, {
-          httpOnly: true
-        })
-        return res.status(200).json({
-          accessToken: accessToken,
-          refreshToken: refreshToken
-        })
+        res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 6000 })
+        res.cookie('refreshToken', refreshToken, { httpOnly: true })
+        return res.status(200).end()
       })
     })
   })(req, res)
@@ -127,13 +119,14 @@ module.exports.refresh = function (req, res) {
     if (err||!user) return res.status(401).json({ user: null })
     const time1 = moment()
     const time2 = moment(payload.exp * 1000)
-    const accessToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '1m'})
-    
+    const accessToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '1m' })
+    res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 6000 })
     if (moment.duration(time2.diff(time1)).asDays() < 1) {
       const refreshToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' })
-      return res.status(201).json({ refreshToken: refreshToken, accessToken: accessToken, user: user })
+      res.cookie('refreshToken', refreshToken, { httpOnly: true })
+      return res.status(201).json({ user: user })
     }
-    res.status(201).json({ accessToken: accessToken, user: user })
+    res.status(201).json({ user: user })
   })(req, res)
 }
 

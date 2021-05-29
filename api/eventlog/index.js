@@ -3,7 +3,6 @@ const evnetlog = require('../../models/Logs')
 module.exports.get = function (req, res) {
   let search = ''
   let zones = ''
-  console.log(req.query)
   if (req.query.search !== 'undefined') { search = req.query.search }
   if (req.query.zones) { zones = req.query.zones }
 
