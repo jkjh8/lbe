@@ -19,7 +19,11 @@ const usersRouter = require('./routes/users')
 
 const app = express();
 
-app.use(cors({ origin: true, credentials: true }))
+app.use(cors({
+  origin: function (origin, callback) {
+    callback(null, origin)
+  }, credentials: true
+}))
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }))

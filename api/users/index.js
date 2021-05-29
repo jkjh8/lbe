@@ -74,6 +74,13 @@ module.exports.login = function (req, res) {
         if (err) {
           console.log(err)
         }
+        res.cookie('accessToken', accessToken, {
+          httpOnly: true,
+          maxAge: 6000
+        })
+        res.cookie('refreshToken', refreshToken, {
+          httpOnly: true
+        })
         return res.status(200).json({
           accessToken: accessToken,
           refreshToken: refreshToken
@@ -131,6 +138,8 @@ module.exports.refresh = function (req, res) {
 }
 
 module.exports.logout = function(req, res) {
+  console.log(req.cookies)
+  res.clearCookie('refreshToken')
   req.logout()
   return res.status(200).json({
     message: 'Logout complate',
