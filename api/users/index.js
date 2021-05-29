@@ -53,7 +53,7 @@ module.exports.login = function (req, res) {
       const accessToken = jwt.sign({
         email: user.email
       }, process.env.JWT_SECRET, {
-        expiresIn: '1m'
+        expiresIn: '5m'
       })
 
       const refreshToken = jwt.sign({
@@ -74,8 +74,15 @@ module.exports.login = function (req, res) {
         if (err) {
           console.log(err)
         }
-        res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 6000 })
-        res.cookie('refreshToken', refreshToken, { httpOnly: true })
+        res.cookie('accessToken', accessToken, { httpOnly: true })
+        console.log(req.body)
+        if (req.body.keepLoggedIn) {
+          const now = new Date()
+          const date = new Date(now.setMonth(now.getMonth() + 1))
+          res.cookie('refreshToken', refreshToken, { httpOnly: true, expires: date })
+        } else {
+          res.cookie('refreshToken', refreshToken, { httpOnly: true })
+        }
         return res.status(200).end()
       })
     })
@@ -119,8 +126,8 @@ module.exports.refresh = function (req, res) {
     if (err||!user) return res.status(401).json({ user: null })
     const time1 = moment()
     const time2 = moment(payload.exp * 1000)
-    const accessToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '1m' })
-    res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 6000 })
+    const accessToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '5m' })
+    res.cookie('accessToken', accessToken, { httpOnly: true })
     if (moment.duration(time2.diff(time1)).asDays() < 1) {
       const refreshToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' })
       res.cookie('refreshToken', refreshToken, { httpOnly: true })
@@ -132,6 +139,7 @@ module.exports.refresh = function (req, res) {
 
 module.exports.logout = function(req, res) {
   console.log(req.cookies)
+  res.clearCookie('accessToken')
   res.clearCookie('refreshToken')
   req.logout()
   return res.status(200).json({
