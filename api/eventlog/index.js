@@ -22,7 +22,6 @@ module.exports.get = function (req, res) {
     limit: req.query.limit,
     sort: { date: -1 }
   }
-  console.log(searchOptions)
   evnetlog.paginate(searchOptions, options, (err, r) => {
     if (err) return res.status(500).json({ status: 'error', value: err })
     return res.status(200).json(r)
