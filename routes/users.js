@@ -10,10 +10,12 @@ const { isLoggedIn } = require('../api/users')
 // });
 
 router.post('/local', users.login)
+router.post('/oauth', users.loginOauth)
 router.post('/local/register', users.register)
 router.get('/logout', users.logout)
 
 router.get('/get', isLoggedIn, users.getUser)
 router.get('/refresh', users.refresh)
+router.post('/del', isLoggedIn, users.delUser)
 
 module.exports = router

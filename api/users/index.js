@@ -12,16 +12,7 @@ module.exports.register = async function (req, res) {
   const chkEmail = await User.findOne({ email: req.body.email })
   if (chkEmail) return res.status(403).json({ message: '이미 가입된 이메일 입니다.' })
 
-  const user = new User({
-    id: req.body.email,
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    provider: 'local',
-    admin: false,
-    createAt: Date.now(),
-    level: 0
-  })
+  const user = new User(req.body)
 
   user.save((err, user) => {
     if (err) return res.status(500).json({
@@ -31,6 +22,46 @@ module.exports.register = async function (req, res) {
       message: 'user save complate'
     })
   })
+}
+
+module.exports.loginOauth = async function (req, res) {
+  if (req.body.email) {
+    const user = await User.findOne({ email: req.body.email })
+    if (user) {
+      const accessToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '5m' })
+      const refreshToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' })
+      User.updateOne({ email: user.email }, { $set: { loginAt: Date.now() } }, { upsert: true }, (err) => {
+        if (err) { return console.log(err) }
+        res.cookie('accessToken', accessToken, { httpOnly: true })
+        if (req.body.keepLoggedIn) {
+          const now = new Date()
+          const date = new Date(now.setMonth(now.getMonth() + 1))
+          res.cookie('refreshToken', refreshToken, { httpOnly: true, expires: date })
+        } else {
+          res.cookie('refreshToken', refreshToken, { httpOnly: true })
+        }
+        return res.status(200).end()
+      })
+    } else {
+      res.status(404).json({
+        error: true,
+        info: {
+          user: null,
+          status: false,
+          message: '사용자를 찾을 수 없습니다.'
+        }
+      })
+    }
+  } else {
+    res.status(404).json({
+        error: true,
+        info: {
+          user: null,
+          status: false,
+          message: '이메일을 확인할 수 없습니다. 다른 방법으로 시도해 주세요.'
+        }
+      })
+  }
 }
 
 module.exports.login = function (req, res) {
@@ -50,23 +81,14 @@ module.exports.login = function (req, res) {
         message: 'user error', error: error
       })
       
-      const accessToken = jwt.sign({
-        email: user.email
-      }, process.env.JWT_SECRET, {
-        expiresIn: '5m'
-      })
-
-      const refreshToken = jwt.sign({
-        email: user.email
-      }, process.env.JWT_SECRET, {
-        expiresIn: '7d'
-      })
+      const accessToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '5m' })
+      const refreshToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' })
 
       User.updateOne({
         email: user.email
       }, {
         $set: {
-          updateAt: Date.now()
+          loginAt: Date.now()
         }
       }, {
         upsert: true
@@ -75,7 +97,6 @@ module.exports.login = function (req, res) {
           console.log(err)
         }
         res.cookie('accessToken', accessToken, { httpOnly: true })
-        console.log(req.body)
         if (req.body.keepLoggedIn) {
           const now = new Date()
           const date = new Date(now.setMonth(now.getMonth() + 1))
@@ -115,7 +136,7 @@ module.exports.isLoggedIn = (req, res, next) => {
       res.status(401).json({
         user: null,
         status: false,
-        info: '로그인 되지 않았습ㄴ디ㅏ.'
+        info: '로그인 되지 않았습니다.'
       })
     }
   })(req, res, next)
@@ -155,6 +176,25 @@ module.exports.users = async function(req, res) {
     const users = await User.find({})
     res.status(200).json({ users: users })
   })(req, res)
+}
+
+module.exports.delUser = async function (req, res) {
+  try {
+    const user = req.body
+    console.log(user)
+    res.clearCookie('accessToken')
+    res.clearCookie('refreshToken')
+    req.logout()
+
+    const result = await User.deleteOne({ email: user.email })
+    if (result.deletedCount === 1) {
+      return res.status(200).json({ success: true, message: 'delete user' })
+    } else {
+      return res.status(500).json({ success: false, message: 'Server error' })
+    }
+  } catch {
+    res.status(500).json({ success: false, message: 'Server error' })
+  }
 }
 
 // module.exports.update = async function(req, res) {
