@@ -8,8 +8,10 @@ router.get('/', function(req, res, next) {
 
 const users = require('./users')
 const log = require('./log')
+const zones = require('./zones')
 
 router.use('/auth', users)
 router.use('/log', log)
+router.use('/zones', zones)
 
 module.exports = router
