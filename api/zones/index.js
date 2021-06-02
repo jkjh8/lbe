@@ -1,6 +1,7 @@
 const Zones = require('../../models/Zones')
 
 module.exports.get = async function (req, res) {
+  io.emit('zones', 'hello!')
   try {
     const zones = await Zones.find({})
     return res.status(200).json({ locals: zones })
