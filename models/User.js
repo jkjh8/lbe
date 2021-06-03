@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String },
   nickname: { type: String },
   profile_image: { type: String},
-  email: { type: String, unique: true },
+  email: { type: String },
   password: { type: String, bcrypt: true},
   admin: { type: Boolean, default: false},
   level: { type: Number, default: 0 },

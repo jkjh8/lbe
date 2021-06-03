@@ -9,14 +9,15 @@ dotenv.config({ path: path.join(__dirname, '../../.env') })
 
 module.exports.register = async function (req, res) {
   console.log(req.body)
-  const chkEmail = await User.findOne({ email: req.body.email })
-  if (chkEmail) return res.status(403).json({ message: '이미 가입된 이메일 입니다.' })
+  const chkId = await User.findOne({ id: req.body.id })
+  if (chkId) return res.status(403).json({ message: '이미 가입되었습니다.' })
 
   const user = new User(req.body)
 
   user.save((err, user) => {
     if (err) return res.status(500).json({
-      message: 'Error on register'
+      message: 'Error on register',
+      error: err
     })
     return res.status(200).json({
       message: 'user save complate'
@@ -26,11 +27,15 @@ module.exports.register = async function (req, res) {
 
 module.exports.loginOauth = async function (req, res) {
   if (req.body.email) {
-    const user = await User.findOne({ email: req.body.email })
+    const user = await User.findOne({ id: req.body.id })
     if (user) {
-      const accessToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '5m' })
-      const refreshToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' })
-      User.updateOne({ email: user.email }, { $set: { loginAt: Date.now() } }, { upsert: true }, (err) => {
+      const userInfo = {
+        id: user.id,
+        email: user.email
+      }
+      const accessToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '5m' })
+      const refreshToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '7d' })
+      User.updateOne({ id: user.id }, { $set: { loginAt: Date.now() } }, { upsert: true }, (err) => {
         if (err) { return console.log(err) }
         res.cookie('accessToken', accessToken, { httpOnly: true })
         if (req.body.keepLoggedIn) {
@@ -58,7 +63,7 @@ module.exports.loginOauth = async function (req, res) {
         info: {
           user: null,
           status: false,
-          message: '이메일을 확인할 수 없습니다. 다른 방법으로 시도해 주세요.'
+          message: '사용자를 확인할 수 없습니다. 다른 방법으로 시도해 주세요.'
         }
       })
   }
@@ -81,11 +86,15 @@ module.exports.login = function (req, res) {
         message: 'user error', error: error
       })
       
-      const accessToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '5m' })
-      const refreshToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' })
+      const userInfo = {
+        id: user.id,
+        email: user.email
+      }
+      const accessToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '5m' })
+      const refreshToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '7d' })
 
       User.updateOne({
-        email: user.email
+        id: user.id
       }, {
         $set: {
           loginAt: Date.now()
@@ -145,12 +154,16 @@ module.exports.isLoggedIn = (req, res, next) => {
 module.exports.refresh = function (req, res) {
   passport.authenticate('refresh', { session: false }, (err, user, payload) => {
     if (err||!user) return res.status(401).json({ user: null })
+    const userInfo = {
+      id: user.id,
+      email: user.email
+    }
     const time1 = moment()
     const time2 = moment(payload.exp * 1000)
-    const accessToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '5m' })
+    const accessToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '5m' })
     res.cookie('accessToken', accessToken, { httpOnly: true })
     if (moment.duration(time2.diff(time1)).asDays() < 1) {
-      const refreshToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' })
+      const refreshToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '7d' })
       res.cookie('refreshToken', refreshToken, { httpOnly: true })
       return res.status(201).json({ user: user })
     }

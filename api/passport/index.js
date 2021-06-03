@@ -22,7 +22,7 @@ const getRefreshTokenFromCookie = function (req) {
   return token
 }
 
-const LocalOption = { usernameField: 'email', passwordField: 'password' }
+const LocalOption = { usernameField: 'id', passwordField: 'password' }
 const jwtOption = {
   jwtFromRequest: getAccessTokenFromCookie,
   secretOrKey: process.env.JWT_SECRET
@@ -33,12 +33,10 @@ const refOption = {
 }
 
 // 로컬 인증
-async function localVerify(email, password, done) {
+async function localVerify(id, password, done) {
   let user
   try {
-    user = Users.findOne({ email: email }, { _id: 0 })
-    if (!user) { return done(null, false, { message: '사용자를 찾을 수 없습니다.' }) }
-    Users.findOne({ email: email }, { _id: 0 }, (err, user) => {
+    Users.findOne({ id: id }, { _id: 0 }, (err, user) => {
       if (err) return done(err)
       if (!user) return done(null, false, { message: '사용자를 찾을 수 없습니다.' })
       if (bcrypt.compareSync(password, user.password)) {
@@ -57,7 +55,7 @@ async function jwtVerift(payload, done) {
   // let user
   // console.log('refresh', user)
   try {
-    user = await Users.findOne({ email: payload.email }, { _id: 0, password: 0 })
+    user = await Users.findOne({ id: payload.id }, { _id: 0, password: 0 })
     if (!user) return done(null, false, { message: '사용자를 찾을 수 없습니다.' })
     return done(null, user, payload)
   } catch (err) {
