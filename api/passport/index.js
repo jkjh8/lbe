@@ -4,7 +4,7 @@ const path = require('path')
 const dotenv = require('dotenv')
 
 const JWTStrategy = require('passport-jwt').Strategy
-const ExtractJwt = require('passport-jwt').ExtractJwt
+// const ExtractJwt = require('passport-jwt').ExtractJwt
 const LocalStrategy = require("passport-local").Strategy
 
 const Users = require("../../models/User") //load db

@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt')
 const mongoose = require('mongoose')
-mongoose.set('useCreateIndex', true)
+// mongoose.set('useCreateIndex', true)
 
 const userSchema = new mongoose.Schema({
   id: { type: String, unique: true },
@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
   admin: { type: Boolean, default: false},
   level: { type: Number, default: 0 },
   provider: { type: String },
+  preset: { type: Array },
   createAt: { type: Date },
   updateAt: { type: Date },
   loginAt: { type: Date }

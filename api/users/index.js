@@ -15,6 +15,7 @@ module.exports.register = async function (req, res) {
   const user = new User(req.body)
 
   user.save((err, user) => {
+    console.log(err, user)
     if (err) return res.status(500).json({
       message: 'Error on register',
       error: err

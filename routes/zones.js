@@ -11,4 +11,8 @@ const { isLoggedIn } = require('../api/users')
 
 router.get('/get', isLoggedIn, zones.get)
 
+router.post('/addRelays', isLoggedIn, zones.addRelays)
+router.post('/updateRelay', isLoggedIn, zones.updatRelay)
+router.post('/deleteRelay', isLoggedIn, zones.deleteRelay)
+
 module.exports = router

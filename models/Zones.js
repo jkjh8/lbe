@@ -10,6 +10,7 @@ const zonesSchema = new mongoose.Schema({
   zones: { type: Array },
   relays: { type: Array },
   fn: { type: Array },
+  es: { type: Boolean, requird: true },
   createAt: { type: Date },
   updateAt: { type: Date }
 })
