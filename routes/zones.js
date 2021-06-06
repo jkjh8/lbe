@@ -12,6 +12,7 @@ const { isLoggedIn } = require('../api/users')
 router.get('/get', isLoggedIn, zones.get)
 
 router.post('/updateZoneName', isLoggedIn, zones.updateZone)
+router.get('/resetZones', zones.resetZones)
 
 router.post('/addRelays', isLoggedIn, zones.addRelays)
 router.post('/updateRelay', isLoggedIn, zones.updatRelay)

@@ -13,6 +13,24 @@ module.exports.get = async function (req, res) {
 }
 
 // ----------------------------- ZONE -----------------------------
+module.exports.resetZones = async function(req, res) {
+  const id = req.query.id
+  const r = await Zones.findOne({ id: id })
+
+  let ar = []
+
+  for(let i = 0; i < r.zones.length; i++) {
+    r.zones[i].id = i
+    ar.push(r.zones[i])
+  }
+
+  const rt = await Zones.updateOne({ id: id }, { $set: { zones: ar, updateAt: Date.now() } }, { upsert: true })
+
+  // const rt = await r.save()
+  console.log(rt)
+  res.status(200).json(rt)
+}
+
 module.exports.addZoness = async function(req, res) {
   try {
     const data = req.body
@@ -21,6 +39,9 @@ module.exports.addZoness = async function(req, res) {
     for(let i = 0; i < data.zone.length; i++) {
       r.zones.push(data.zone[i])
     }
+
+    r.updateAt = Date.now()
+
     const rt = await r.save()
     res.status(200).json(rt)
   } catch (err) {
@@ -37,6 +58,8 @@ module.exports.updateZone = async function(req, res) {
     r.zones[data.zone.id].code = data.zone.code
     r.zones[data.zone.id].type = data.zone.type
 
+    r.updateAt = Date.now()
+
     const rt = await r.save()
     res.status(200).json(rt)
   } catch (err) {
@@ -52,6 +75,9 @@ module.exports.deleteZone = async function(req, res) {
     for(let i = 0; i < r.zones.length; i++) {
       r.zones[i].id = i
     }
+
+    r.updateAt = Date.now()
+
     const rt = await r.save()
     // const rt = await Zones.updateOne({ id: data.local }, { $set: { zones: r.zones, updateAt: Date.now() } }, { upsert: true })
     res.status(200).json(rt)
@@ -62,6 +88,24 @@ module.exports.deleteZone = async function(req, res) {
 
 
 // ----------------------------- RELAY -----------------------------
+module.exports.resetRelays = async function(req, res) {
+  const id = req.query.id
+  const r = await Zones.findOne({ id: id })
+
+  let ar = []
+
+  for(let i = 0; i < r.relays.length; i++) {
+    r.relays[i].id = i
+    ar.push(r.relays[i])
+  }
+
+  const rt = await Zones.updateOne({ id: id }, { $set: { relays: ar, updateAt: Date.now() } }, { upsert: true })
+
+  // const rt = await r.save()
+  console.log(rt)
+  res.status(200).json(rt)
+}
+
 module.exports.addRelays = async function(req, res) {
   try {
     const data = req.body
@@ -70,6 +114,9 @@ module.exports.addRelays = async function(req, res) {
     for(let i = 0; i < data.relay.length; i++) {
       r.relays.push(data.relay[i])
     }
+
+    r.updateAt = Date.now()
+
     const rt = await r.save()
     res.status(200).json(rt)
   } catch (err) {
@@ -82,6 +129,9 @@ module.exports.updatRelay = async function(req, res) {
     const data = req.body
     const r = await Zones.findOne({ id: data.local })
     r.relays[data.relay.id] = data.relay
+
+    r.updateAt = Date.now()
+
     rt = await r.save()
     res.status(200).json(rt)
   } catch (err) {
@@ -97,6 +147,8 @@ module.exports.deleteRelay = async function(req, res) {
     for(let i = 0; i < r.relays.length; i++) {
       r.relays[i].id = i
     }
+
+    r.updateAt = Date.now()
 
     const rt = await r.save()
     // const rt = await Zones.updateOne({ id: data.local }, { $set: { relays: r.relays } }, { upsert: true })
