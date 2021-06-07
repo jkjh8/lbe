@@ -9,9 +9,14 @@ const { isLoggedIn } = require('../api/users')
 //   res.send('respond with a resource');
 // });
 
-router.get('/get', isLoggedIn, zones.get)
+router.post('/addLocals', isLoggedIn, zones.addLocals)
+router.post('/updateLocalName', isLoggedIn, zones.updateLocalName)
+router.get('/deleteLocal', isLoggedIn, zones.deleteLocal)
 
+router.get('/get', isLoggedIn, zones.get)
+router.post('/addZones', isLoggedIn, zones.addZones)
 router.post('/updateZoneName', isLoggedIn, zones.updateZone)
+router.post('/deleteZone', isLoggedIn, zones.deleteZone)
 router.get('/resetZones', zones.resetZones)
 
 router.post('/addRelays', isLoggedIn, zones.addRelays)

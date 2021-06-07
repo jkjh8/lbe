@@ -28,7 +28,7 @@ const zonesSchema = new mongoose.Schema({
   })],
   fn: { type: Array },
   es: { type: Boolean, requird: true },
-  createAt: { type: Date },
+  createAt: { type: Date, default: Date.now },
   updateAt: { type: Date }
 })
 

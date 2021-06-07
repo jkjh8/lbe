@@ -12,26 +12,77 @@ module.exports.get = async function (req, res) {
   }
 }
 
-// ----------------------------- ZONE -----------------------------
-module.exports.resetZones = async function(req, res) {
-  const id = req.query.id
-  const r = await Zones.findOne({ id: id })
+// LOCALS
+module.exports.addLocals = async function(req, res) {
+  const data = req.body
+  console.log(data)
 
-  let ar = []
-
-  for(let i = 0; i < r.zones.length; i++) {
-    r.zones[i].id = i
-    ar.push(r.zones[i])
+  for(let i = 0; i < data.length; i++) {
+    r = new Zones({
+      id: data[i].id,
+      name: data[i].name,
+      code: data[i].code,
+      zones: [],
+      relays: [],
+      createAt: Date.now(),
+      updateAt: Date.now()
+    })
+    await r.save()
   }
-
-  const rt = await Zones.updateOne({ id: id }, { $set: { zones: ar, updateAt: Date.now() } }, { upsert: true })
-
-  // const rt = await r.save()
-  console.log(rt)
-  res.status(200).json(rt)
+  res.status(200).json({ status: 'success' })
 }
 
-module.exports.addZoness = async function(req, res) {
+
+module.exports.updateLocalName  = async function(req, res) {
+  try {
+    const data = req.body
+    const r = await Zones.findOne({ _id: data._id })
+    r.id = data.id
+    r.name = data.name
+    r.code = data.code
+    r.updateAt = Date.now()
+
+    const rt = await r.save()
+    res.status(200).json(rt)
+  } catch (err) {
+    res.status(500).json(err)
+  }
+}
+
+module.exports.deleteLocal = async function(req, res) {
+  try {
+    const id = req.query.id
+    const r = await Zones.findByIdAndRemove(id)
+    const rid = await Zones.find({})
+    for (let i = 0; i < rid.length; i++) {
+      await Zones.updateOne({ _id: rid[i]._id }, { $set: { id: i + 1 } })
+    }
+    res.status(200).json({ success: true })
+  } catch (err) {
+    res.status(500).json(err)
+  }
+}
+
+// ----------------------------- ZONE -----------------------------
+module.exports.resetZones = async function(req, res) {
+  try {
+    const id = req.query.id
+    const r = await Zones.findOne({ id: id })
+
+    let refZone = []
+    let refRelay = []
+
+    for(let i = 0; i < r.zones.length; i++) { r.zones[i].id = i; refZone.push(r.zones[i]) }
+    for(let i = 0; i < r.relays.length; i++) { r.relays[i].id = i; refRelay.push(r.relays[i]) }
+
+    const rt = await Zones.updateOne({ id: id }, { $set: { zones: refZone, relays: refRelay, updateAt: Date.now() } }, { upsert: true })
+    res.status(200).json(rt)
+  } catch (err) {
+    res.status(500).json(err)
+  }
+}
+
+module.exports.addZones = async function(req, res) {
   try {
     const data = req.body
     const r = await Zones.findOne({ id: data.local })
@@ -71,7 +122,7 @@ module.exports.deleteZone = async function(req, res) {
   try {
     const data = req.body
     const r = await Zones.findOne({ id: data.local })
-    r.relays.id(data.zones._id).remove()
+    r.zones.id(data.zone._id).remove()
     for(let i = 0; i < r.zones.length; i++) {
       r.zones[i].id = i
     }
