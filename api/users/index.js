@@ -34,7 +34,7 @@ module.exports.loginOauth = async function (req, res) {
         id: user.id,
         email: user.email
       }
-      const accessToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '5m' })
+      const accessToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '1h' })
       const refreshToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '7d' })
       User.updateOne({ id: user.id }, { $set: { loginAt: Date.now() } }, { upsert: true }, (err) => {
         if (err) { return console.log(err) }
@@ -91,7 +91,7 @@ module.exports.login = function (req, res) {
         id: user.id,
         email: user.email
       }
-      const accessToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '5m' })
+      const accessToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '1h' })
       const refreshToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '7d' })
 
       User.updateOne({
@@ -161,7 +161,7 @@ module.exports.refresh = function (req, res) {
     }
     const time1 = moment()
     const time2 = moment(payload.exp * 1000)
-    const accessToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '5m' })
+    const accessToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '1h' })
     res.cookie('accessToken', accessToken, { httpOnly: true })
     if (moment.duration(time2.diff(time1)).asDays() < 1) {
       const refreshToken = jwt.sign(userInfo, process.env.JWT_SECRET, { expiresIn: '7d' })
