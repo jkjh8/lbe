@@ -18,4 +18,6 @@ router.get('/get', isLoggedIn, users.getUser)
 router.get('/refresh', users.refresh)
 router.post('/del', isLoggedIn, users.delUser)
 
+router.get('/users', isLoggedIn, users.users)
+
 module.exports = router
