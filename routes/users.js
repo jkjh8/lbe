@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 
 const users = require('../api/users')
+const admin = require('../api/users/admin.js')
 const { isLoggedIn } = require('../api/users')
 
 /* GET users listing. */
@@ -18,6 +19,7 @@ router.get('/get', isLoggedIn, users.getUser)
 router.get('/refresh', users.refresh)
 router.post('/del', isLoggedIn, users.delUser)
 
-router.get('/users', isLoggedIn, users.users)
+router.get('/users', isLoggedIn, admin.users)
+router.post('/admin', isLoggedIn, admin.updateAdmin)
 
 module.exports = router

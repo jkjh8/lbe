@@ -183,15 +183,6 @@ module.exports.logout = function(req, res) {
   })
 }
 
-module.exports.users = async function(req, res) {
-  passport.authenticate('access', { session: false }, async (err, user) => {
-    if (err) { return res.status(401).json({ users: null }) }
-    if (!user.admin) { return res.status(403).json({ users: null }) }
-    const users = await User.find({})
-    res.status(200).json({ users: users })
-  })(req, res)
-}
-
 module.exports.delUser = async function (req, res) {
   try {
     const user = req.body
