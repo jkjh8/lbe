@@ -21,5 +21,7 @@ router.post('/del', isLoggedIn, users.delUser)
 
 router.get('/users', isLoggedIn, admin.users)
 router.post('/admin', isLoggedIn, admin.updateAdmin)
+router.post('/updateLevel', isLoggedIn, admin.updateLevel)
+router.post('/deleteUser', isLoggedIn, admin.delelteUser)
 
 module.exports = router
