@@ -5,6 +5,7 @@ const zonesSchema = new mongoose.Schema({
   mon: { type: Boolean, requird: true, default: false },
   vol: { type: Number, requird: true, default: 70 },
   mute: { type: Boolean, requird: true, default: false },
+  sig: { type: Boolean, requird: true, default: false },
   name: { type: String, requird: true },
   code: { type: String },
   zones: [new mongoose.Schema ({

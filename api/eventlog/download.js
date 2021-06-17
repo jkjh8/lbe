@@ -19,7 +19,6 @@ function logObjToSheet (docs) {
 
 module.exports.getCsv = async function (req, res) {
   let zones = ''
-  console.log(req.query)
   const enable = req.query.date
   const start = req.query.start
   const end = req.query.end
