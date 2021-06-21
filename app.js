@@ -52,6 +52,7 @@ app.use(function(err, req, res, next) {
   res.render('error')
 })
 
-require('./socket/LogUdp')
+require('./socket/LogUdpText')
+require('./socket/LogUdpJson')
 
 module.exports = app

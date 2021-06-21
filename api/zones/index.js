@@ -24,6 +24,8 @@ module.exports.addLocals = async function(req, res) {
       code: data[i].code,
       zones: [],
       relays: [],
+      es: data[i].es,
+      esNum: data[i].esNum,
       createAt: Date.now(),
       updateAt: Date.now()
     })
@@ -40,6 +42,8 @@ module.exports.updateLocalName  = async function(req, res) {
     r.id = data.id
     r.name = data.name
     r.code = data.code
+    r.es = data.es
+    r.esNum = data.esNum
     r.updateAt = Date.now()
 
     const rt = await r.save()

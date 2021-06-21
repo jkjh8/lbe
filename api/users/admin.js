@@ -4,7 +4,6 @@ const User = require('../../models/User')
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const dotenv = require('dotenv')
-const { ESRCH } = require('constants')
 
 dotenv.config({ path: path.join(__dirname, '../../.env') })
 

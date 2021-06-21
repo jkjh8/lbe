@@ -3,10 +3,10 @@ const dbLogs = require('../models/Logs')
 
 function startup () {
   return new dbLogs({
-    source: 'LogServer',
+    source: '로그서버',
     category: 'Info',
     zones: '방송센터',
-    message: 'Log Server Started!'
+    message: 'Log Server DB Started!'
   })
 }
 
