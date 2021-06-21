@@ -8,7 +8,7 @@ const passport = require('passport')
 
 const db = require('./db')
 
-// const history = require('connect-history-api-fallback')
+const history = require('connect-history-api-fallback')
 
 const passportConfig = require('./api/passport')
 require('dotenv').config()
@@ -18,6 +18,7 @@ const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
 
 const app = express();
+app.use(history())
 
 app.use(cors({
   origin: function (origin, callback) {
