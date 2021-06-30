@@ -3,7 +3,7 @@ const Zones = require('../../models/Zones')
 module.exports.get = async function (req, res) {
   // io.emit('zones', 'hello!')
   try {
-    const zones = await Zones.find({})
+    const zones = await Zones.find({}).sort({ id: 1 })
     io.emit('zones', zones)
     return res.status(200).json({ locals: zones })
   } catch (err) {
@@ -44,6 +44,8 @@ module.exports.updateLocalName  = async function(req, res) {
     r.code = data.code
     r.es = data.es
     r.esNum = data.esNum
+    r.dsp = data.dsp
+    r.pagecontrol = data.pagecontrol
     r.updateAt = Date.now()
 
     const rt = await r.save()

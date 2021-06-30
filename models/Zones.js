@@ -8,6 +8,8 @@ const zonesSchema = new mongoose.Schema({
   sig: { type: Boolean, requird: true, default: false },
   name: { type: String, requird: true },
   code: { type: String },
+  dsp: { type: Object, default: { ip: '', port: 1023 } },
+  pagecontrol: { type: Object, default: { ip: '', port: 8888 } },
   zones: [new mongoose.Schema ({
     id: { type: Number, requird: true, },
     name: { type: String, requird: true,},
