@@ -22,7 +22,7 @@ const getRefreshTokenFromCookie = function (req) {
   return token
 }
 
-const LocalOption = { usernameField: 'email', passwordField: 'password' }
+const LocalOption = { usernameField: 'id', passwordField: 'password' }
 const jwtOption = {
   jwtFromRequest: getAccessTokenFromCookie,
   secretOrKey: process.env.JWT_SECRET
