@@ -4,39 +4,39 @@
  * Module dependencies.
  */
 
-var app = require('../app');
+var { app, server, port } = require('../app');
 var debug = require('debug')('lbe:server');
-var http = require('http');
+// var http = require('http');
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+// var port = normalizePort(process.env.PORT || '3000');
+// app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
-const io = require('socket.io')(server,  {
-  cors: {
-    origin: [
-      'http://192.168.1.92',
-      'http://192.168.1.92:3000',
-      'http://localhost:3000',
-      'http://localhost:8080',
-      'https//192.168.1.92'
-    ],
-    methods: ['GET', 'POST'],
-    transports: ['websocket', 'polling'],
-    credentials: true
-  },
-  allowEIO3: true
-})
-global.io = io
-require('../socketio.js')
+// var server = http.createServer(app);
+// const io = require('socket.io')(server,  {
+//   cors: {
+//     origin: [
+//       'http://192.168.1.92',
+//       'http://192.168.1.92:3000',
+//       'http://localhost:3000',
+//       'http://localhost:8080',
+//       'https//192.168.1.92'
+//     ],
+//     methods: ['GET', 'POST'],
+//     transports: ['websocket', 'polling'],
+//     credentials: true
+//   },
+//   allowEIO3: true
+// })
+// global.io = io
+// require('../socketio.js')
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -50,21 +50,21 @@ server.on('listening', onListening);
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val) {
-  var port = parseInt(val, 10);
+// function normalizePort(val) {
+//   var port = parseInt(val, 10);
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
+//   if (isNaN(port)) {
+//     // named pipe
+//     return val;
+//   }
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
+//   if (port >= 0) {
+//     // port number
+//     return port;
+//   }
 
-  return false;
-}
+//   return false;
+// }
 
 /**
  * Event listener for HTTP server "error" event.

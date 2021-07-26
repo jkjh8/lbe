@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const dbLogs = require('../models/Logs')
 
+console.log('load db start')
+
 function startup () {
   return new dbLogs({
     source: '로그서버',
@@ -23,9 +25,9 @@ const db = mongoose.connection
 db.on('error', console.error.bind(console, 'db Connection Error:'))
 
 db.once('open', () => {
+  console.log('MongoDB connected...')
   const msg = startup()
   msg.save()
-  console.log('MongoDB connected...')
 })
 
 module.exports = db

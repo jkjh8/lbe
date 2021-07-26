@@ -5,8 +5,28 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors')
 const passport = require('passport')
+const http = require('http')
 
-const db = require('./db')
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+const port = normalizePort(process.env.PORT || '3000');
+
+
+require('./db')
 
 const history = require('connect-history-api-fallback')
 
@@ -53,7 +73,28 @@ app.use(function(err, req, res, next) {
   res.render('error')
 })
 
+app.set('port', port)
+
+const server = http.createServer(app);
+global.io = require('socket.io')(server,  {
+  cors: {
+    origin: [
+      'http://192.168.1.92',
+      'http://192.168.1.92:3000',
+      'http://localhost:3000',
+      'http://localhost:8080',
+      'https//192.168.1.92'
+    ],
+    methods: ['GET', 'POST'],
+    transports: ['websocket', 'polling'],
+    credentials: true
+  },
+  allowEIO3: true
+})
+
 require('./socket/LogUdpText')
 require('./socket/LogUdpJson')
+require('./socket/socketio.js')
+require('./socket/ZoneRt')
 
-module.exports = app
+module.exports = { app, server, port }

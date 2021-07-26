@@ -8,14 +8,17 @@ const dotenv = require('dotenv')
 dotenv.config({ path: path.join(__dirname, '../../.env') })
 
 module.exports.register = async function (req, res) {
-  console.log(req.body)
-  const chkId = await User.findOne({ id: req.body.id })
+  const user = req.body
+  if (!user.id) {
+    user.id = user.email
+  }
+  const chkId = await User.findOne({ id: user.id })
   if (chkId) return res.status(403).json({ message: '이미 가입되었습니다.' })
 
-  const user = new User(req.body)
+  const newUser = new User(user)
 
-  user.save((err, user) => {
-    console.log(err, user)
+  newUser.save((err, res) => {
+    console.log(err, res)
     if (err) return res.status(500).json({
       message: 'Error on register',
       error: err
@@ -71,11 +74,12 @@ module.exports.loginOauth = async function (req, res) {
 }
 
 module.exports.login = function (req, res) {
+  console.log('start login local', req.body)
   passport.authenticate('local', {
     session: false
   }, (err, user, info) => {
     console.log(err, user, info)
-    if (err || !user) return res.status(404).json({
+    if (err || !user) return res.status(403).json({
       message: 'Error! user not found',
       info: info
     })
@@ -83,7 +87,7 @@ module.exports.login = function (req, res) {
     req.login(user, {
       session: false
     }, (error) => {
-      if (error) return res.status(404).json({
+      if (error) return res.status(403).json({
         message: 'user error', error: error
       })
       
