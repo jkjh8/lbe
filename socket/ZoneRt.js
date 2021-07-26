@@ -10,7 +10,7 @@ const server = net.createServer((client) => {
     const req = data.toString().toLowerCase().split(',')
     if (req[0] === "zone") {
       r = await getZone(req[1])
-    } else if (req[0] == 'relay') {
+    } else if (req[0] === 'relay') {
       r = await getRelay(req[1])
     }
     client.write(r + ',!')
